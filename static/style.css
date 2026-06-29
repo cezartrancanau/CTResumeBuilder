@@ -1,0 +1,96 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #f4f6f8;
+  color: #111827;
+  font-family: Arial, sans-serif;
+}
+.container {
+  width: min(1050px, 94vw);
+  margin: 32px auto;
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+.container.small { max-width: 720px; }
+h1 { margin-top: 0; }
+fieldset {
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  margin: 20px 0;
+  padding: 18px;
+}
+legend { font-weight: 700; padding: 0 8px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+label { display: block; font-weight: 600; margin-bottom: 6px; }
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+textarea { min-height: 86px; resize: vertical; }
+.row-block {
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 14px;
+  margin: 12px 0;
+  background: #fafafa;
+}
+button, .button {
+  display: inline-block;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: #111827;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 700;
+  margin: 8px 8px 8px 0;
+}
+button.secondary, .button.secondary { background: #4b5563; }
+.error {
+  white-space: pre-wrap;
+  background: #fee2e2;
+  padding: 12px;
+  border-radius: 8px;
+}
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+.checkbox { display: block; margin: 16px 0; font-weight: 500; }
+.checkbox input { width: auto; margin-right: 8px; }
+.count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.count-row label { margin: 0; }
+.count-row input { max-width: 110px; }
+.row-block h3 { margin: 0 0 12px; font-size: 16px; }
+.hint { color: #4b5563; }
+@media (max-width: 760px) {
+  .count-row { align-items: stretch; flex-direction: column; }
+  .count-row input { max-width: 100%; }
+}
+.entry-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.entry-title h3 { margin: 0; }
+.remove-btn {
+  background: #991b1b;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.add-btn { margin-top: 4px; }

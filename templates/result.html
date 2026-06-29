@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CV Generated</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container small">
+    <h1>CV generated</h1>
+    {% if pdf_ready %}
+      <p>Your PDF and LaTeX file are ready.</p>
+      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+      <a class="button" href="{{ pdf_url }}">Download PDF</a>
+      <a class="button secondary" href="{{ tex_url }}">Download TEX</a>
+    {% else %}
+      <p>The LaTeX file was generated, but PDF generation did not finish.</p>
+      <p class="error">{{ error }}</p>
+      <a class="button" href="{{ tex_url }}">Download TEX</a>
+    {% endif %}
+    <p><a href="/">Generate another CV</a></p>
+  </main>
+</body>
+</html>

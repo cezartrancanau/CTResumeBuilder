@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CTResumeBuilder</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="container">
+  <h1>CTResumeBuilder</h1>
+  <p>Fill your details, add as many sections as you need, then generate your CV.</p>
+
+  <form method="post" action="/generate">
+    <fieldset>
+      <legend>Personal details</legend>
+      <div class="grid">
+        <div><label>Name</label><input name="name"></div>
+        <div><label>Location</label><input name="location"></div>
+        <div><label>Email</label><input name="email"></div>
+        <div><label>Phone</label><input name="phone"></div>
+        <div><label>GitHub URL</label><input name="github_url" placeholder="https://github.com/username"></div>
+        <div><label>GitHub text</label><input name="github_text" placeholder="github.com/username"></div>
+        <div><label>LinkedIn URL</label><input name="linkedin_url" placeholder="https://www.linkedin.com/in/username"></div>
+        <div><label>LinkedIn text</label><input name="linkedin_text" placeholder="linkedin.com/in/username"></div>
+      </div>
+      <p><label>About Me</label><textarea name="about"></textarea></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Education</legend>
+      <div id="education_container"></div>
+      <button type="button" class="secondary add-btn" data-section="education">+ Add Education</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Skills</legend>
+      <div id="skills_container"></div>
+      <button type="button" class="secondary add-btn" data-section="skills">+ Add Skill Category</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Projects</legend>
+      <div id="projects_container"></div>
+      <button type="button" class="secondary add-btn" data-section="projects">+ Add Project</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Awards</legend>
+      <div id="awards_container"></div>
+      <button type="button" class="secondary add-btn" data-section="awards">+ Add Award</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Publications</legend>
+      <div id="publications_container"></div>
+      <button type="button" class="secondary add-btn" data-section="publications">+ Add Publication</button>
+    </fieldset>
+
+    <p class="hint">The app uses a base LaTeX template that avoids missing MiKTeX packages.</p>
+
+    <button type="submit">Generate CV</button>
+  </form>
+</main>
+
+<script>
+const counters = { education: 0, skills: 0, projects: 0, awards: 0, publications: 0 };
+
+const templates = {
+  education: (i) => `
+    <div class="row-block" data-entry="education">
+      <div class="entry-title"><h3>Education ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
+      <div class="grid">
+        <div><label>School</label><input name="edu_school"></div>
+        <div><label>Location</label><input name="edu_location"></div>
+        <div><label>Degree / Program</label><input name="edu_degree"></div>
+        <div><label>Dates</label><input name="edu_dates"></div>
+      </div>
+      <p><label>Extra note</label><input name="edu_note" placeholder="optional"></p>
+      <p><label>Bullets, one per line</label><textarea name="edu_bullets"></textarea></p>
+    </div>`,
+
+  skills: (i) => `
+    <div class="row-block" data-entry="skills">
+      <div class="entry-title"><h3>Skill Category ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
+      <div class="grid">
+        <div><label>Category</label><input name="skill_name"></div>
+        <div><label>Details</label><input name="skill_value"></div>
+      </div>
+    </div>`,
+
+  projects: (i) => `
+    <div class="row-block" data-entry="projects">
+      <div class="entry-title"><h3>Project ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
+      <div class="grid">
+        <div><label>Name</label><input name="project_name"></div>
+        <div><label>URL</label><input name="project_url"></div>
+      </div>
+      <p><label>Description</label><textarea name="project_description"></textarea></p>
+    </div>`,
+
+  awards: (i) => `
+    <div class="row-block" data-entry="awards">
+      <div class="entry-title"><h3>Award ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
+      <div class="grid">
+        <div><label>Award</label><input name="award_name"></div>
+        <div><label>Dates</label><input name="award_dates"></div>
+      </div>
+      <p><label>Description</label><textarea name="award_description"></textarea></p>
+      <p><label>Bullets, one per line</label><textarea name="award_bullets"></textarea></p>
+    </div>`,
+
+  publications: (i) => `
+    <div class="row-block" data-entry="publications">
+      <div class="entry-title"><h3>Publication ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
+      <div class="grid">
+        <div><label>Title</label><input name="publication_title"></div>
+        <div><label>URL</label><input name="publication_url"></div>
+      </div>
+      <p><label>Authors</label><input name="publication_authors"></p>
+    </div>`
+};
+
+function renumber(section) {
+  document.querySelectorAll(`[data-entry="${section}"] h3`).forEach((title, index) => {
+    const names = { education: "Education", skills: "Skill Category", projects: "Project", awards: "Award", publications: "Publication" };
+    title.textContent = `${names[section]} ${index + 1}`;
+  });
+}
+
+function addEntry(section) {
+  counters[section] += 1;
+  const container = document.getElementById(`${section}_container`);
+  container.insertAdjacentHTML("beforeend", templates[section](counters[section]));
+  renumber(section);
+}
+
+document.querySelectorAll(".add-btn").forEach((button) => {
+  button.addEventListener("click", () => addEntry(button.dataset.section));
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.classList.contains("remove-btn")) return;
+  const block = event.target.closest(".row-block");
+  const section = block.dataset.entry;
+  block.remove();
+  renumber(section);
+});
+
+// Start with one useful entry for the common sections. Publications starts empty.
+["education", "skills", "projects", "awards"].forEach(addEntry);
+</script>
+</body>
+</html>

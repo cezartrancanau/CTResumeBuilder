@@ -1,0 +1,150 @@
+\documentclass[letterpaper,12pt]{article}
+
+% Base-LaTeX-only version: no fullpage, titlesec, enumitem, hyperref, fancyhdr, tabularx, babel.
+% This avoids MiKTeX package-install prompts and still keeps the resume layout close to the original template.
+
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{-0.5in}
+\setlength{\textwidth}{7.5in}
+\setlength{\topmargin}{-0.5in}
+\setlength{\textheight}{10in}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0in}
+\raggedbottom
+\raggedright
+\pagestyle{plain}
+
+% Hyperlink fallback: prints only the visible text.
+\newcommand{\href}[2]{#2}
+
+% Section style similar to titlesec version: small caps + horizontal rule.
+\makeatletter
+\renewcommand{\section}[1]{%
+  \vspace{6pt}%
+  {\large\scshape\raggedright #1}\par\vspace{2pt}%
+  \hrule\vspace{5pt}%
+}
+\makeatother
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[2]{%
+  \item\small{\textbf{#1}{: #2 \vspace{-2pt}}}%
+}
+
+\newcommand{\resumeSubheadingFive}[5]{%
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small #3} & \textit{\small #4} \\
+      \textit{\small #5} & \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeHeading}[4]{%
+    \begin{tabular*}{0.99\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small #3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubheading}[4]{%
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small #3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{%
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small #1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeItemPlain}[1]{%
+  \item\small{{#1 \vspace{-2pt}}}%
+}
+
+\newcommand{\resumeAward}[3]{%
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textit{\small #3} \\
+      \multicolumn{2}{p{0.97\textwidth}}{\textit{\small #2}} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-4pt}}
+
+\renewcommand{\labelitemii}{$\circ$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}\setlength{\leftmargin}{0pt}\setlength{\itemsep}{2pt}}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}\setlength{\itemsep}{1pt}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\newcommand{\resumePublication}[2]{%
+  \item\small{%
+    \textbf{#1}\\[-2pt]
+    \textit{(#2)}%
+  }\vspace{-2pt}
+}
+
+%-------------------------------------------
+%%%%%%  CV STARTS HERE  %%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING-----------------
+\begin{center}
+    {\fontsize{21}{23}\selectfont\bfseries test}\\[5pt]
+    \href{https://github.com/test}{GitHub}\\[5pt]
+    \href{https://linkedin.com/test}{LinkedIn}\\[5pt]
+\href{mailto:test@email.com}{test@email.com}    \hspace{1em}\textbar\hspace{1em}0123456789    \hspace{1em}\textbar\hspace{1em}test
+\end{center}
+
+\vspace{-8pt}
+\section{About Me}
+\small{
+test
+}
+
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {test}
+      {test}
+      {test}
+      {test}
+
+      \resumeItemListStart
+        \resumeItemPlain{test}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+\section{Skills}
+  \resumeSubHeadingListStart
+  \resumeSubItem{test}
+    {test}
+  \resumeSubHeadingListEnd
+
+\section{Projects}
+  \resumeSubHeadingListStart
+    \resumeSubItem{\href{test}{test}}
+      {test}
+  \resumeSubHeadingListEnd
+
+\section{Awards}
+  \resumeSubHeadingListStart
+    \resumeAward
+      {test}
+      {test}
+      {test}
+
+  \resumeSubHeadingListEnd
+
+
+
+%-------------------------------------------
+\end{document}
