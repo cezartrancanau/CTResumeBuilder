@@ -146,16 +146,6 @@ http://127.0.0.1:5050
 
 ---
 
-## Roadmap
-
-- Live PDF preview
-- Theme customization
-- Multi-language interface
-- Cover letter generator
-- Resume scoring / ATS suggestions
-
----
-
 ## Contributing
 
 Contributions, feature requests and bug reports are welcome.
