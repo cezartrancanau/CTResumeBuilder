@@ -8,18 +8,20 @@
 </head>
 <body>
   <main class="container small">
-    <h1>CV generated</h1>
+    <h1>✅ Resume generated successfully</h1>
     {% if pdf_ready %}
-      <p>Your PDF and LaTeX file are ready.</p>
+      <p class="success">Your PDF, LaTeX file and reusable JSON draft are ready.</p>
       {% if error %}<p class="error">{{ error }}</p>{% endif %}
       <a class="button" href="{{ pdf_url }}">Download PDF</a>
       <a class="button secondary" href="{{ tex_url }}">Download TEX</a>
+      <a class="button secondary" href="{{ json_url }}">Download JSON</a>
     {% else %}
       <p>The LaTeX file was generated, but PDF generation did not finish.</p>
       <p class="error">{{ error }}</p>
       <a class="button" href="{{ tex_url }}">Download TEX</a>
+      <a class="button secondary" href="{{ json_url }}">Download JSON</a>
     {% endif %}
-    <p><a href="/">Generate another CV</a></p>
+    <p><a href="/">Create another resume</a></p>
   </main>
 </body>
 </html>

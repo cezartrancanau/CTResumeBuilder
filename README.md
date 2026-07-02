@@ -18,12 +18,36 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 
 ---
 
+## What's New in v1
+
+- Multiple resume templates: Classic, Modern and Minimal
+- Optional profile photo upload
+- Professional Summary section
+- Improved Work Experience section with company, position, location, start date, end date and current job checkbox
+- Languages section
+- Certifications section
+- Interests / Hobbies section
+- Extended social links: GitHub, LinkedIn, Portfolio, Website, X, Stack Overflow, LeetCode, Codeforces and Kaggle
+- Drag-and-drop section ordering
+- Dark mode
+- Save resume as JSON draft
+- Import existing `resume.json`
+- One-click example resume loader
+- Better form validation for required fields, email and URLs
+- Success page with PDF, TEX and JSON downloads
+- Automatic cleanup for older generated files
+- Cleaner generated filenames
+- Improved fallback PDF generation when LaTeX is unavailable
+
+---
+
 ## Key Highlights
 
 - Built with Python and Flask
 - Automatically generates professional LaTeX resumes
 - Produces ATS-friendly PDF output
 - Dynamic resume sections with unlimited entries
+- Resume import/export support
 - Lightweight and fully customizable
 
 ---
@@ -31,18 +55,29 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 ## Features
 
 - Professional PDF generation powered by LaTeX
+- Automatic fallback PDF generation when a LaTeX distribution is unavailable
 - Responsive and intuitive web interface
 - Dynamic resume sections with unlimited entries
+- Drag-and-drop section ordering
+- Dark mode
+- Save and load resume drafts using JSON
 - Support for:
+  - Professional Summary
+  - Work Experience
   - Education
   - Skills
   - Projects
+  - Languages
+  - Certifications
   - Awards
   - Publications
-- GitHub and LinkedIn profile integration
-- Automatic generation of `cv.tex`
-- Easily customizable LaTeX template
-- Automatic fallback PDF generation when a LaTeX distribution is unavailable
+  - Interests / Hobbies
+- Extended profile and social link integration
+- Automatic generation of:
+  - `cv.tex`
+  - `cv.pdf`
+  - `resume.json`
+- Easily customizable LaTeX templates
 
 ---
 
@@ -52,8 +87,9 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 | :--- | :--- |
 | Backend | Python, Flask |
 | Frontend | HTML, CSS, JavaScript |
-| PDF Generation | LaTeX |
+| PDF Generation | LaTeX, ReportLab fallback |
 | Template Engine | Jinja2 |
+| Data Export | JSON |
 
 ---
 
@@ -78,12 +114,6 @@ Run the application:
 python app.py
 ```
 
-or simply execute:
-
-```bash
-RUN_APP.bat
-```
-
 Open your browser:
 
 ```text
@@ -95,24 +125,34 @@ http://127.0.0.1:5050
 ## Usage
 
 1. Launch the application.
-2. Complete the resume form.
-3. Add or remove resume entries dynamically.
-4. Generate your resume.
-5. Download:
-   - `cv.tex`
+2. Choose a resume template.
+3. Complete the resume form.
+4. Add or remove resume entries dynamically.
+5. Reorder sections with drag and drop.
+6. Optional: save or import a JSON resume draft.
+7. Generate your resume.
+8. Download:
    - `cv.pdf`
+   - `cv.tex`
+   - `resume.json`
+
+---
+
+## Default Templates
+
+- **Classic** - traditional resume layout
+- **Modern** - slightly stronger section styling
+- **Minimal** - simple and clean layout
 
 ---
 
 ## Roadmap
 
-- Multiple resume templates
 - Live PDF preview
-- Drag-and-drop section ordering
 - Theme customization
-- Dark mode
-- Resume import and export
-- Multi-language support
+- Multi-language interface
+- Cover letter generator
+- Resume scoring / ATS suggestions
 
 ---
 
@@ -121,13 +161,3 @@ http://127.0.0.1:5050
 Contributions, feature requests and bug reports are welcome.
 
 If you have an idea for an improvement, feel free to open an issue or submit a pull request.
-
----
-
-## Preview
-
-   * **Example of generated CV**
-
-<p align="center">
-<img src="https://i.imgur.com/CkjSB5P.png"></img>
-</p>

@@ -3,152 +3,949 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CTResumeBuilder</title>
+  <title>CTResumeBuilder v1</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<main class="container">
-  <h1>CTResumeBuilder</h1>
-  <p>Fill your details, add as many sections as you need, then generate your CV.</p>
-
-  <form method="post" action="/generate">
-    <fieldset>
-      <legend>Personal details</legend>
-      <div class="grid">
-        <div><label>Name</label><input name="name"></div>
-        <div><label>Location</label><input name="location"></div>
-        <div><label>Email</label><input name="email"></div>
-        <div><label>Phone</label><input name="phone"></div>
-        <div><label>GitHub URL</label><input name="github_url" placeholder="https://github.com/username"></div>
-        <div><label>GitHub text</label><input name="github_text" placeholder="github.com/username"></div>
-        <div><label>LinkedIn URL</label><input name="linkedin_url" placeholder="https://www.linkedin.com/in/username"></div>
-        <div><label>LinkedIn text</label><input name="linkedin_text" placeholder="linkedin.com/in/username"></div>
+  <main class="container">
+    <div class="topbar">
+      <div>
+        <h1>CTResumeBuilder <span>v1</span></h1>
+        <p>Build, save, import and export professional resumes.</p>
       </div>
-      <p><label>About Me</label><textarea name="about"></textarea></p>
-    </fieldset>
 
-    <fieldset>
-      <legend>Education</legend>
-      <div id="education_container"></div>
-      <button type="button" class="secondary add-btn" data-section="education">+ Add Education</button>
-    </fieldset>
+      <button type="button" id="themeToggle" class="secondary">
+        Dark Mode
+      </button>
+    </div>
 
-    <fieldset>
-      <legend>Skills</legend>
-      <div id="skills_container"></div>
-      <button type="button" class="secondary add-btn" data-section="skills">+ Add Skill Category</button>
-    </fieldset>
+    <form id="resumeForm" method="post" action="/generate" enctype="multipart/form-data" novalidate>
+      <input
+        type="hidden"
+        name="section_order"
+        id="section_order"
+        value="summary,experience,education,skills,projects,languages,certifications,awards,publications,interests"
+      >
 
-    <fieldset>
-      <legend>Projects</legend>
-      <div id="projects_container"></div>
-      <button type="button" class="secondary add-btn" data-section="projects">+ Add Project</button>
-    </fieldset>
+      <fieldset>
+        <legend>Resume setup</legend>
 
-    <fieldset>
-      <legend>Awards</legend>
-      <div id="awards_container"></div>
-      <button type="button" class="secondary add-btn" data-section="awards">+ Add Award</button>
-    </fieldset>
+        <div class="grid">
+          <div>
+            <label>Template</label>
+            <select name="resume_template">
+              <option value="classic">Classic</option>
+              <option value="modern">Modern</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </div>
 
-    <fieldset>
-      <legend>Publications</legend>
-      <div id="publications_container"></div>
-      <button type="button" class="secondary add-btn" data-section="publications">+ Add Publication</button>
-    </fieldset>
+          <div>
+            <label>Import saved resume.json</label>
+            <input type="file" id="importJson" accept="application/json,.json">
+          </div>
+        </div>
 
-    <p class="hint">The app uses a base LaTeX template that avoids missing MiKTeX packages.</p>
+        <div class="actions">
+          <button type="button" class="secondary" id="loadExample">
+            Load Example Resume
+          </button>
 
-    <button type="submit">Generate CV</button>
-  </form>
-</main>
+          <button type="button" class="secondary" id="saveDraft">
+            Save Resume JSON
+          </button>
+        </div>
 
-<script>
-const counters = { education: 0, skills: 0, projects: 0, awards: 0, publications: 0 };
+        <p class="hint">
+          Use drag & drop below to reorder sections before generating the PDF.
+        </p>
+      </fieldset>
 
-const templates = {
-  education: (i) => `
-    <div class="row-block" data-entry="education">
-      <div class="entry-title"><h3>Education ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
-      <div class="grid">
-        <div><label>School</label><input name="edu_school"></div>
-        <div><label>Location</label><input name="edu_location"></div>
-        <div><label>Degree / Program</label><input name="edu_degree"></div>
-        <div><label>Dates</label><input name="edu_dates"></div>
-      </div>
-      <p><label>Extra note</label><input name="edu_note" placeholder="optional"></p>
-      <p><label>Bullets, one per line</label><textarea name="edu_bullets"></textarea></p>
-    </div>`,
+      <fieldset>
+        <legend>Personal details</legend>
 
-  skills: (i) => `
-    <div class="row-block" data-entry="skills">
-      <div class="entry-title"><h3>Skill Category ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
-      <div class="grid">
-        <div><label>Category</label><input name="skill_name"></div>
-        <div><label>Details</label><input name="skill_value"></div>
-      </div>
-    </div>`,
+        <div class="grid">
+          <div>
+            <label>Name *</label>
+            <input name="name" required>
+          </div>
 
-  projects: (i) => `
-    <div class="row-block" data-entry="projects">
-      <div class="entry-title"><h3>Project ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
-      <div class="grid">
-        <div><label>Name</label><input name="project_name"></div>
-        <div><label>URL</label><input name="project_url"></div>
-      </div>
-      <p><label>Description</label><textarea name="project_description"></textarea></p>
-    </div>`,
+          <div>
+            <label>Location</label>
+            <input name="location">
+          </div>
 
-  awards: (i) => `
-    <div class="row-block" data-entry="awards">
-      <div class="entry-title"><h3>Award ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
-      <div class="grid">
-        <div><label>Award</label><input name="award_name"></div>
-        <div><label>Dates</label><input name="award_dates"></div>
-      </div>
-      <p><label>Description</label><textarea name="award_description"></textarea></p>
-      <p><label>Bullets, one per line</label><textarea name="award_bullets"></textarea></p>
-    </div>`,
+          <div>
+            <label>Email *</label>
+            <input name="email" type="email" required>
+          </div>
 
-  publications: (i) => `
-    <div class="row-block" data-entry="publications">
-      <div class="entry-title"><h3>Publication ${i}</h3><button type="button" class="remove-btn">Remove</button></div>
-      <div class="grid">
-        <div><label>Title</label><input name="publication_title"></div>
-        <div><label>URL</label><input name="publication_url"></div>
-      </div>
-      <p><label>Authors</label><input name="publication_authors"></p>
-    </div>`
-};
+          <div>
+            <label>Phone</label>
+            <input name="phone">
+          </div>
+        </div>
 
-function renumber(section) {
-  document.querySelectorAll(`[data-entry="${section}"] h3`).forEach((title, index) => {
-    const names = { education: "Education", skills: "Skill Category", projects: "Project", awards: "Award", publications: "Publication" };
-    title.textContent = `${names[section]} ${index + 1}`;
-  });
-}
+        <label class="checkbox">
+          <input type="checkbox" name="include_photo" id="include_photo">
+          Include profile photo
+        </label>
 
-function addEntry(section) {
-  counters[section] += 1;
-  const container = document.getElementById(`${section}_container`);
-  container.insertAdjacentHTML("beforeend", templates[section](counters[section]));
-  renumber(section);
-}
+        <div id="photoBox" class="hidden">
+          <label>Profile photo</label>
+          <input type="file" name="profile_photo" accept="image/png,image/jpeg">
+        </div>
+      </fieldset>
 
-document.querySelectorAll(".add-btn").forEach((button) => {
-  button.addEventListener("click", () => addEntry(button.dataset.section));
-});
+      <fieldset>
+        <legend>Social links</legend>
 
-document.addEventListener("click", (event) => {
-  if (!event.target.classList.contains("remove-btn")) return;
-  const block = event.target.closest(".row-block");
-  const section = block.dataset.entry;
-  block.remove();
-  renumber(section);
-});
+        <div class="grid social-grid">
+          <div>
+            <label>GitHub URL</label>
+            <input name="github_url" placeholder="https://github.com/username">
+          </div>
+          <div>
+            <label>GitHub text</label>
+            <input name="github_text" placeholder="github.com/username">
+          </div>
 
-// Start with one useful entry for the common sections. Publications starts empty.
-["education", "skills", "projects", "awards"].forEach(addEntry);
-</script>
+          <div>
+            <label>LinkedIn URL</label>
+            <input name="linkedin_url" placeholder="https://linkedin.com/in/username">
+          </div>
+          <div>
+            <label>LinkedIn text</label>
+            <input name="linkedin_text" placeholder="linkedin.com/in/username">
+          </div>
+
+          <div>
+            <label>Portfolio URL</label>
+            <input name="portfolio_url">
+          </div>
+          <div>
+            <label>Portfolio text</label>
+            <input name="portfolio_text">
+          </div>
+
+          <div>
+            <label>Website URL</label>
+            <input name="website_url">
+          </div>
+          <div>
+            <label>Website text</label>
+            <input name="website_text">
+          </div>
+
+          <div>
+            <label>X URL</label>
+            <input name="x_url">
+          </div>
+          <div>
+            <label>X text</label>
+            <input name="x_text">
+          </div>
+
+          <div>
+            <label>Stack Overflow URL</label>
+            <input name="stackoverflow_url">
+          </div>
+          <div>
+            <label>Stack Overflow text</label>
+            <input name="stackoverflow_text">
+          </div>
+
+          <div>
+            <label>LeetCode URL</label>
+            <input name="leetcode_url">
+          </div>
+          <div>
+            <label>LeetCode text</label>
+            <input name="leetcode_text">
+          </div>
+
+          <div>
+            <label>Codeforces URL</label>
+            <input name="codeforces_url">
+          </div>
+          <div>
+            <label>Codeforces text</label>
+            <input name="codeforces_text">
+          </div>
+
+          <div>
+            <label>Kaggle URL</label>
+            <input name="kaggle_url">
+          </div>
+          <div>
+            <label>Kaggle text</label>
+            <input name="kaggle_text">
+          </div>
+        </div>
+      </fieldset>
+
+      <section id="sectionList">
+        <fieldset class="resume-section" draggable="true" data-section="summary">
+          <legend>Professional Summary</legend>
+          <textarea name="summary" placeholder="Short 3-4 line resume summary"></textarea>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="experience">
+          <legend>Work Experience</legend>
+          <div id="experience_container"></div>
+          <button type="button" class="secondary add-btn" data-section="experience">
+            + Add Experience
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="education">
+          <legend>Education</legend>
+          <div id="education_container"></div>
+          <button type="button" class="secondary add-btn" data-section="education">
+            + Add Education
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="skills">
+          <legend>Skills</legend>
+          <div id="skills_container"></div>
+          <button type="button" class="secondary add-btn" data-section="skills">
+            + Add Skill Category
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="projects">
+          <legend>Projects</legend>
+          <div id="projects_container"></div>
+          <button type="button" class="secondary add-btn" data-section="projects">
+            + Add Project
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="languages">
+          <legend>Languages</legend>
+          <div id="languages_container"></div>
+          <button type="button" class="secondary add-btn" data-section="languages">
+            + Add Language
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="certifications">
+          <legend>Certifications</legend>
+          <div id="certifications_container"></div>
+          <button type="button" class="secondary add-btn" data-section="certifications">
+            + Add Certification
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="awards">
+          <legend>Awards</legend>
+          <div id="awards_container"></div>
+          <button type="button" class="secondary add-btn" data-section="awards">
+            + Add Award
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="publications">
+          <legend>Publications</legend>
+          <div id="publications_container"></div>
+          <button type="button" class="secondary add-btn" data-section="publications">
+            + Add Publication
+          </button>
+        </fieldset>
+
+        <fieldset class="resume-section" draggable="true" data-section="interests">
+          <legend>Interests / Hobbies</legend>
+          <div id="interests_container"></div>
+          <button type="button" class="secondary add-btn" data-section="interests">
+            + Add Interest
+          </button>
+        </fieldset>
+      </section>
+
+      <div id="validationBox" class="error hidden"></div>
+
+      <p class="hint">
+        The app tries LaTeX first. If LaTeX is unavailable, it still generates a fast fallback PDF.
+      </p>
+
+      <button type="submit">Generate CV</button>
+    </form>
+  </main>
+
+  <script>
+
+    const SECTION_NAMES = {
+      experience: "Experience",
+      education: "Education",
+      skills: "Skill Category",
+      projects: "Project",
+      languages: "Language",
+      certifications: "Certification",
+      awards: "Award",
+      publications: "Publication",
+      interests: "Interest"
+    };
+
+    const counters = {
+      experience: 0,
+      education: 0,
+      skills: 0,
+      projects: 0,
+      languages: 0,
+      certifications: 0,
+      awards: 0,
+      publications: 0,
+      interests: 0
+    };
+
+    const dynamicSections = Object.keys(counters);
+
+    const templates = {
+      experience: (index) => `
+        <div class="row-block" data-entry="experience">
+          <div class="entry-title">
+            <h3>Experience ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Company</label>
+              <input name="exp_company">
+            </div>
+            <div>
+              <label>Position</label>
+              <input name="exp_position">
+            </div>
+            <div>
+              <label>Location</label>
+              <input name="exp_location">
+            </div>
+            <div>
+              <label>Start Date</label>
+              <input name="exp_start">
+            </div>
+            <div>
+              <label>End Date</label>
+              <input name="exp_end">
+            </div>
+
+            <label class="checkbox inline">
+              <input type="checkbox" class="current-job">
+              Current Job
+            </label>
+          </div>
+
+          <p>
+            <label>Bullets, one per line</label>
+            <textarea name="exp_bullets"></textarea>
+          </p>
+        </div>
+      `,
+
+      education: (index) => `
+        <div class="row-block" data-entry="education">
+          <div class="entry-title">
+            <h3>Education ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>School</label>
+              <input name="edu_school">
+            </div>
+            <div>
+              <label>Location</label>
+              <input name="edu_location">
+            </div>
+            <div>
+              <label>Degree / Program</label>
+              <input name="edu_degree">
+            </div>
+            <div>
+              <label>Dates</label>
+              <input name="edu_dates">
+            </div>
+          </div>
+
+          <p>
+            <label>Extra note</label>
+            <input name="edu_note" placeholder="optional">
+          </p>
+
+          <p>
+            <label>Bullets, one per line</label>
+            <textarea name="edu_bullets"></textarea>
+          </p>
+        </div>
+      `,
+
+      skills: (index) => `
+        <div class="row-block" data-entry="skills">
+          <div class="entry-title">
+            <h3>Skill Category ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Category</label>
+              <input name="skill_name">
+            </div>
+            <div>
+              <label>Details</label>
+              <input name="skill_value">
+            </div>
+          </div>
+        </div>
+      `,
+
+      projects: (index) => `
+        <div class="row-block" data-entry="projects">
+          <div class="entry-title">
+            <h3>Project ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Name</label>
+              <input name="project_name">
+            </div>
+            <div>
+              <label>URL</label>
+              <input name="project_url">
+            </div>
+          </div>
+
+          <p>
+            <label>Description</label>
+            <textarea name="project_description"></textarea>
+          </p>
+        </div>
+      `,
+
+      languages: (index) => `
+        <div class="row-block" data-entry="languages">
+          <div class="entry-title">
+            <h3>Language ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Language</label>
+              <input name="language_name">
+            </div>
+            <div>
+              <label>Level</label>
+              <input name="language_level" placeholder="Native, C1, B2">
+            </div>
+          </div>
+        </div>
+      `,
+
+      certifications: (index) => `
+        <div class="row-block" data-entry="certifications">
+          <div class="entry-title">
+            <h3>Certification ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Name</label>
+              <input name="cert_name">
+            </div>
+            <div>
+              <label>Issuer</label>
+              <input name="cert_issuer">
+            </div>
+            <div>
+              <label>Date</label>
+              <input name="cert_date">
+            </div>
+            <div>
+              <label>URL</label>
+              <input name="cert_url">
+            </div>
+          </div>
+        </div>
+      `,
+
+      awards: (index) => `
+        <div class="row-block" data-entry="awards">
+          <div class="entry-title">
+            <h3>Award ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Award</label>
+              <input name="award_name">
+            </div>
+            <div>
+              <label>Dates</label>
+              <input name="award_dates">
+            </div>
+          </div>
+
+          <p>
+            <label>Description</label>
+            <textarea name="award_description"></textarea>
+          </p>
+
+          <p>
+            <label>Bullets, one per line</label>
+            <textarea name="award_bullets"></textarea>
+          </p>
+        </div>
+      `,
+
+      publications: (index) => `
+        <div class="row-block" data-entry="publications">
+          <div class="entry-title">
+            <h3>Publication ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Title</label>
+              <input name="publication_title">
+            </div>
+            <div>
+              <label>URL</label>
+              <input name="publication_url">
+            </div>
+          </div>
+
+          <p>
+            <label>Authors</label>
+            <input name="publication_authors">
+          </p>
+        </div>
+      `,
+
+      interests: (index) => `
+        <div class="row-block" data-entry="interests">
+          <div class="entry-title">
+            <h3>Interest ${index}</h3>
+            <button type="button" class="remove-btn">Remove</button>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label>Interest</label>
+              <input name="interest_name">
+            </div>
+            <div>
+              <label>Details</label>
+              <input name="interest_value" placeholder="optional">
+            </div>
+          </div>
+        </div>
+      `
+    };
+
+    const exampleResume = {
+      name: "Cezar Trancanau",
+      location: "Bucharest, Romania",
+      email: "cezar@example.com",
+      phone: "+40 700 000 000",
+      resume_template: "modern",
+
+      github_url: "https://github.com/cezartrancanau",
+      github_text: "github.com/cezartrancanau",
+      linkedin_url: "https://linkedin.com/in/cezartrancanau",
+      linkedin_text: "linkedin.com/in/cezartrancanau",
+      portfolio_url: "https://example.com",
+      portfolio_text: "Portfolio",
+
+      summary:
+        "Junior IT / Software enthusiast with hands-on experience building Flask applications, working with databases, and creating practical tools for real users.",
+
+      exp_company: ["Personal Projects"],
+      exp_position: ["Python Flask Developer"],
+      exp_location: ["Remote"],
+      exp_start: ["2025"],
+      exp_end: ["2026"],
+      exp_bullets: [
+        "Built Flask web applications with authentication and CRUD features.\nCreated PDF generation workflows and clean user interfaces."
+      ],
+
+      edu_school: ["University of Bucharest"],
+      edu_location: ["Bucharest"],
+      edu_degree: ["Computer Engineering and Information Technology"],
+      edu_dates: ["2020 - 2023"],
+      edu_note: [""],
+      edu_bullets: [
+        "Studied programming, databases, networking and software engineering."
+      ],
+
+      skill_name: ["Programming", "Tools"],
+      skill_value: [
+        "Python, Flask, SQLite, HTML, CSS, JavaScript",
+        "Git, VS Code, Windows"
+      ],
+
+      project_name: ["CTResumeBuilder"],
+      project_url: ["https://github.com/cezartrancanau/CTResumeBuilder"],
+      project_description: [
+        "Resume builder that generates ATS-friendly PDF and LaTeX resumes."
+      ],
+
+      language_name: ["Romanian", "English"],
+      language_level: ["Native", "C1"],
+
+      cert_name: ["Google IT Support"],
+      cert_issuer: ["Coursera"],
+      cert_date: ["2026"],
+      cert_url: [""],
+
+      interest_name: ["Open Source", "Cybersecurity"],
+      interest_value: ["GitHub projects", "IT support learning"]
+    };
+
+    function addEntry(section) {
+      counters[section]++;
+
+      const container = document.getElementById(`${section}_container`);
+      const html = templates[section](counters[section]);
+
+      container.insertAdjacentHTML("beforeend", html);
+
+      renumber(section);
+    }
+
+    function renumber(section) {
+      const blocks = document.querySelectorAll(`[data-entry="${section}"]`);
+
+      blocks.forEach((block, index) => {
+        const title = block.querySelector("h3");
+
+        if (title) {
+          title.textContent = `${SECTION_NAMES[section]} ${index + 1}`;
+        }
+      });
+
+      updateCurrentJobIndexes();
+    }
+
+    function removeEntry(button) {
+      const block = button.closest(".row-block");
+      const section = block.dataset.entry;
+
+      block.remove();
+      renumber(section);
+    }
+
+    function clearDynamicSections() {
+      dynamicSections.forEach((section) => {
+        const container = document.getElementById(`${section}_container`);
+
+        container.innerHTML = "";
+        counters[section] = 0;
+      });
+    }
+
+    function updateCurrentJobIndexes() {
+      const experienceBlocks = document.querySelectorAll('[data-entry="experience"]');
+
+      experienceBlocks.forEach((block, index) => {
+        const checkbox = block.querySelector(".current-job");
+
+        if (!checkbox) {
+          return;
+        }
+
+        checkbox.name = "exp_current";
+        checkbox.value = index;
+      });
+    }
+
+    let draggedSection = null;
+
+    function updateSectionOrder() {
+      const orderedSections = [...document.querySelectorAll(".resume-section")]
+        .map((section) => section.dataset.section)
+        .join(",");
+
+      document.getElementById("section_order").value = orderedSections;
+    }
+
+    function getDragAfterElement(container, yPosition) {
+      const draggableSections = [
+        ...container.querySelectorAll(".resume-section:not(.dragging)")
+      ];
+
+      return draggableSections.find((section) => {
+        const box = section.getBoundingClientRect();
+        const middleY = box.top + box.height / 2;
+
+        return yPosition <= middleY;
+      });
+    }
+
+    function setupDragAndDrop() {
+      const sectionList = document.getElementById("sectionList");
+      const sections = document.querySelectorAll(".resume-section");
+
+      sections.forEach((section) => {
+        section.addEventListener("dragstart", () => {
+          draggedSection = section;
+          section.classList.add("dragging");
+        });
+
+        section.addEventListener("dragend", () => {
+          section.classList.remove("dragging");
+          updateSectionOrder();
+        });
+
+        section.addEventListener("dragover", (event) => {
+          event.preventDefault();
+
+          const afterElement = getDragAfterElement(sectionList, event.clientY);
+
+          if (afterElement) {
+            sectionList.insertBefore(draggedSection, afterElement);
+          } else {
+            sectionList.appendChild(draggedSection);
+          }
+        });
+      });
+    }
+
+    function applySavedTheme() {
+      const savedTheme = localStorage.getItem("ctresume_theme");
+
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+
+      const currentTheme = document.body.classList.contains("dark")
+        ? "dark"
+        : "light";
+
+      localStorage.setItem("ctresume_theme", currentTheme);
+    }
+
+    function togglePhotoBox(event) {
+      const photoBox = document.getElementById("photoBox");
+      const shouldShowPhotoBox = event.target.checked;
+
+      photoBox.classList.toggle("hidden", !shouldShowPhotoBox);
+    }
+
+    function formToJson() {
+      const form = document.getElementById("resumeForm");
+      const formData = new FormData(form);
+      const data = { version: "v1" };
+
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          continue;
+        }
+
+        if (data[key]) {
+          data[key] = Array.isArray(data[key])
+            ? [...data[key], value]
+            : [data[key], value];
+        } else {
+          data[key] = value;
+        }
+      }
+
+      return data;
+    }
+
+    function saveResumeJson() {
+      const resumeData = formToJson();
+      const json = JSON.stringify(resumeData, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = "resume.json";
+      downloadLink.click();
+
+      URL.revokeObjectURL(downloadLink.href);
+    }
+
+    function setValues(name, values) {
+      const valueList = Array.isArray(values) ? values : [values];
+      const fields = [...document.querySelectorAll(`[name="${name}"]`)];
+
+      fields.forEach((field, index) => {
+        if (field.type === "checkbox") {
+          field.checked = valueList.includes(field.value) || valueList.includes("on");
+        } else {
+          field.value = valueList[index] || "";
+        }
+      });
+    }
+
+    function getDynamicSectionCounts(data) {
+      return {
+        experience: "exp_company",
+        education: "edu_school",
+        skills: "skill_name",
+        projects: "project_name",
+        languages: "language_name",
+        certifications: "cert_name",
+        awards: "award_name",
+        publications: "publication_title",
+        interests: "interest_name"
+      };
+    }
+
+    function loadJson(data) {
+      clearDynamicSections();
+
+      const sectionCountKeys = getDynamicSectionCounts(data);
+
+      Object.entries(sectionCountKeys).forEach(([section, key]) => {
+        const values = data[key];
+        const count = Array.isArray(values) ? values.length : values ? 1 : 0;
+        const entriesToCreate = Math.max(1, count);
+
+        for (let index = 0; index < entriesToCreate; index++) {
+          addEntry(section);
+        }
+      });
+
+      Object.entries(data).forEach(([key, value]) => {
+        setValues(key, value);
+      });
+
+      updateSectionOrder();
+      updateCurrentJobIndexes();
+    }
+
+    function importResumeJson(event) {
+      const file = event.target.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          loadJson(data);
+        } catch (error) {
+          alert("Invalid JSON file.");
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    function validateForm() {
+      const errors = [];
+      const form = document.getElementById("resumeForm");
+      const email = form.email.value.trim();
+
+      if (!form.name.value.trim()) {
+        errors.push("Name is required.");
+      }
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push("Valid email is required.");
+      }
+
+      document.querySelectorAll('input[name$="_url"]').forEach((input) => {
+        const value = input.value.trim();
+        const label = input.previousElementSibling.textContent;
+
+        if (value && !/^https?:\/\//i.test(value)) {
+          errors.push(`${label} must start with http:// or https://`);
+        }
+      });
+
+      const validationBox = document.getElementById("validationBox");
+      validationBox.textContent = errors.join("\n");
+      validationBox.classList.toggle("hidden", errors.length === 0);
+
+      return errors.length === 0;
+    }
+
+    function handleFormSubmit(event) {
+      updateSectionOrder();
+      updateCurrentJobIndexes();
+
+      if (!validateForm()) {
+        event.preventDefault();
+      }
+    }
+
+    function setupEventListeners() {
+      document.querySelectorAll(".add-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          addEntry(button.dataset.section);
+        });
+      });
+
+      document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("remove-btn")) {
+          removeEntry(event.target);
+        }
+      });
+
+      document
+        .getElementById("include_photo")
+        .addEventListener("change", togglePhotoBox);
+
+      document
+        .getElementById("themeToggle")
+        .addEventListener("click", toggleTheme);
+
+      document
+        .getElementById("saveDraft")
+        .addEventListener("click", saveResumeJson);
+
+      document
+        .getElementById("importJson")
+        .addEventListener("change", importResumeJson);
+
+      document
+        .getElementById("loadExample")
+        .addEventListener("click", () => loadJson(exampleResume));
+
+      document
+        .getElementById("resumeForm")
+        .addEventListener("submit", handleFormSubmit);
+    }
+
+    function initializeForm() {
+      applySavedTheme();
+      setupDragAndDrop();
+      setupEventListeners();
+
+      [
+        "experience",
+        "education",
+        "skills",
+        "projects",
+        "languages",
+        "certifications",
+        "awards",
+        "interests"
+      ].forEach(addEntry);
+
+      updateSectionOrder();
+    }
+
+    initializeForm();
+  </script>
 </body>
 </html>
