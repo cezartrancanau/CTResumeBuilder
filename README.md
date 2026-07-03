@@ -18,6 +18,16 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 
 ---
 
+## Prerequisites
+
+Before running CTDesk, install:
+
+- Python 3.10+
+- pip
+- MiKTeX (required for PDF generation)
+
+---
+
 ## What's New in v2
 
 - Improved dark mode visibility and contrast
