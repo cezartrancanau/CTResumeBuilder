@@ -28,56 +28,6 @@ Before running CTDesk, install:
 
 ---
 
-## What's New in v2
-
-- Improved dark mode visibility and contrast
-- Added resume statistics summary before export
-- Added character counters for long text fields
-- Improved generated PDF/TEX download filenames using the candidate name
-- Added reset form option
-- Added duplicate buttons for repeated resume entries
-- Improved form spacing, buttons, focus states and overall UI polish
-
----
-
-## What's New in v1
-
-- Multiple resume templates: Classic, Modern and Minimal
-- Optional profile photo upload
-- Professional Summary section
-- Improved Work Experience section with company, position, location, start date, end date and current job checkbox
-- Languages section
-- Certifications section
-- Interests / Hobbies section
-- Extended social links: GitHub, LinkedIn, Portfolio, Website, X, Stack Overflow, LeetCode, Codeforces and Kaggle
-- Drag-and-drop section ordering
-- Improved dark mode
-- Save resume as JSON draft
-- Import existing `resume.json`
-- One-click example resume loader
-- Better form validation for required fields, email and URLs
-- Success page with PDF, TEX and JSON downloads
-- Automatic cleanup for older generated files
-- Cleaner generated filenames
-- Improved fallback PDF generation when LaTeX is unavailable
-
----
-
-## Key Highlights
-
-- Built with Python and Flask
-- Automatically generates professional LaTeX resumes
-- Produces ATS-friendly PDF output
-- Dynamic resume sections with unlimited entries
-- Duplicate buttons for repeated entries
-- Resume statistics summary
-- Character counters for text areas
-- Reset form option
-- Resume import/export support
-- Lightweight and fully customizable
-
----
-
 ## Features
 
 - Professional PDF generation powered by LaTeX
@@ -180,6 +130,56 @@ http://127.0.0.1:5050
 - **Classic** - traditional resume layout
 - **Modern** - slightly stronger section styling
 - **Minimal** - simple and clean layout
+
+---
+
+## What's New in v2
+
+- Improved dark mode visibility and contrast
+- Added resume statistics summary before export
+- Added character counters for long text fields
+- Improved generated PDF/TEX download filenames using the candidate name
+- Added reset form option
+- Added duplicate buttons for repeated resume entries
+- Improved form spacing, buttons, focus states and overall UI polish
+
+---
+
+## What's New in v1
+
+- Multiple resume templates: Classic, Modern and Minimal
+- Optional profile photo upload
+- Professional Summary section
+- Improved Work Experience section with company, position, location, start date, end date and current job checkbox
+- Languages section
+- Certifications section
+- Interests / Hobbies section
+- Extended social links: GitHub, LinkedIn, Portfolio, Website, X, Stack Overflow, LeetCode, Codeforces and Kaggle
+- Drag-and-drop section ordering
+- Improved dark mode
+- Save resume as JSON draft
+- Import existing `resume.json`
+- One-click example resume loader
+- Better form validation for required fields, email and URLs
+- Success page with PDF, TEX and JSON downloads
+- Automatic cleanup for older generated files
+- Cleaner generated filenames
+- Improved fallback PDF generation when LaTeX is unavailable
+
+---
+
+## Key Highlights
+
+- Built with Python and Flask
+- Automatically generates professional LaTeX resumes
+- Produces ATS-friendly PDF output
+- Dynamic resume sections with unlimited entries
+- Duplicate buttons for repeated entries
+- Resume statistics summary
+- Character counters for text areas
+- Reset form option
+- Resume import/export support
+- Lightweight and fully customizable
 
 ---
 
