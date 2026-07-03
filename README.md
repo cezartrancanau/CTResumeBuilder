@@ -28,6 +28,21 @@ Before running CTDesk, install:
 
 ---
 
+## Key Highlights
+
+- Built with Python and Flask
+- Automatically generates professional LaTeX resumes
+- Produces ATS-friendly PDF output
+- Dynamic resume sections with unlimited entries
+- Duplicate buttons for repeated entries
+- Resume statistics summary
+- Character counters for text areas
+- Reset form option
+- Resume import/export support
+- Lightweight and fully customizable
+
+---
+
 ## Features
 
 - Professional PDF generation powered by LaTeX
@@ -165,21 +180,6 @@ http://127.0.0.1:5050
 - Automatic cleanup for older generated files
 - Cleaner generated filenames
 - Improved fallback PDF generation when LaTeX is unavailable
-
----
-
-## Key Highlights
-
-- Built with Python and Flask
-- Automatically generates professional LaTeX resumes
-- Produces ATS-friendly PDF output
-- Dynamic resume sections with unlimited entries
-- Duplicate buttons for repeated entries
-- Resume statistics summary
-- Character counters for text areas
-- Reset form option
-- Resume import/export support
-- Lightweight and fully customizable
 
 ---
 
