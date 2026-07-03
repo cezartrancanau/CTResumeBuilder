@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CTResumeBuilder v1</title>
+  <title>CTResumeBuilder v2</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <main class="container">
     <div class="topbar">
       <div>
-        <h1>CTResumeBuilder <span>v1</span></h1>
+        <h1>CTResumeBuilder <span>v2</span></h1>
         <p>Build, save, import and export professional resumes.</p>
       </div>
 
@@ -53,6 +53,10 @@
 
           <button type="button" class="secondary" id="saveDraft">
             Save Resume JSON
+          </button>
+
+          <button type="button" class="secondary danger-outline" id="resetForm">
+            Reset Form
           </button>
         </div>
 
@@ -263,6 +267,17 @@
         </fieldset>
       </section>
 
+      <div class="stats-box" id="statsBox">
+        <h2>Resume Statistics</h2>
+        <div class="stats-grid">
+          <span><strong id="statExperience">0</strong> experience entries</span>
+          <span><strong id="statEducation">0</strong> education entries</span>
+          <span><strong id="statSkills">0</strong> skill categories</span>
+          <span><strong id="statProjects">0</strong> projects</span>
+          <span><strong id="statCharacters">0</strong> written characters</span>
+        </div>
+      </div>
+
       <div id="validationBox" class="error hidden"></div>
 
       <p class="hint">
@@ -306,6 +321,7 @@
         <div class="row-block" data-entry="experience">
           <div class="entry-title">
             <h3>Experience ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -348,6 +364,7 @@
         <div class="row-block" data-entry="education">
           <div class="entry-title">
             <h3>Education ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -386,6 +403,7 @@
         <div class="row-block" data-entry="skills">
           <div class="entry-title">
             <h3>Skill Category ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -406,6 +424,7 @@
         <div class="row-block" data-entry="projects">
           <div class="entry-title">
             <h3>Project ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -431,6 +450,7 @@
         <div class="row-block" data-entry="languages">
           <div class="entry-title">
             <h3>Language ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -451,6 +471,7 @@
         <div class="row-block" data-entry="certifications">
           <div class="entry-title">
             <h3>Certification ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -479,6 +500,7 @@
         <div class="row-block" data-entry="awards">
           <div class="entry-title">
             <h3>Award ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -509,6 +531,7 @@
         <div class="row-block" data-entry="publications">
           <div class="entry-title">
             <h3>Publication ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -534,6 +557,7 @@
         <div class="row-block" data-entry="interests">
           <div class="entry-title">
             <h3>Interest ${index}</h3>
+            <button type="button" class="secondary duplicate-btn">Duplicate</button>
             <button type="button" class="remove-btn">Remove</button>
           </div>
 
@@ -619,6 +643,8 @@
       container.insertAdjacentHTML("beforeend", html);
 
       renumber(section);
+      setupCharacterCounters();
+      updateResumeStats();
     }
 
     function renumber(section) {
@@ -827,6 +853,8 @@
 
       updateSectionOrder();
       updateCurrentJobIndexes();
+      setupCharacterCounters();
+      updateResumeStats();
     }
 
     function importResumeJson(event) {
@@ -888,6 +916,81 @@
       }
     }
 
+
+    function addCharacterCounter(field) {
+      if (!field || field.dataset.counterReady === "true") {
+        return;
+      }
+
+      field.dataset.counterReady = "true";
+      const counter = document.createElement("small");
+      counter.className = "char-counter";
+      field.insertAdjacentElement("afterend", counter);
+
+      const update = () => {
+        counter.textContent = `${field.value.length} characters`;
+        updateResumeStats();
+      };
+
+      field.addEventListener("input", update);
+      update();
+    }
+
+    function setupCharacterCounters() {
+      document.querySelectorAll("textarea").forEach(addCharacterCounter);
+    }
+
+    function countFilledBlocks(section) {
+      return [...document.querySelectorAll(`[data-entry="${section}"]`)].filter((block) => {
+        return [...block.querySelectorAll("input, textarea, select")]
+          .some((field) => field.type === "checkbox" ? field.checked : field.value.trim());
+      }).length;
+    }
+
+    function updateResumeStats() {
+      document.getElementById("statExperience").textContent = countFilledBlocks("experience");
+      document.getElementById("statEducation").textContent = countFilledBlocks("education");
+      document.getElementById("statSkills").textContent = countFilledBlocks("skills");
+      document.getElementById("statProjects").textContent = countFilledBlocks("projects");
+      const totalChars = [...document.querySelectorAll("input, textarea")]
+        .reduce((sum, field) => sum + field.value.trim().length, 0);
+      document.getElementById("statCharacters").textContent = totalChars;
+    }
+
+    function duplicateEntry(button) {
+      const block = button.closest(".row-block");
+      const section = block.dataset.entry;
+      const clone = block.cloneNode(true);
+
+      clone.querySelectorAll("input, textarea, select").forEach((field, index) => {
+        const originalField = block.querySelectorAll("input, textarea, select")[index];
+        if (!originalField) return;
+        if (field.type === "checkbox") {
+          field.checked = originalField.checked;
+        } else {
+          field.value = originalField.value;
+        }
+        field.dataset.counterReady = "false";
+      });
+
+      clone.querySelectorAll(".char-counter").forEach((counter) => counter.remove());
+      block.insertAdjacentElement("afterend", clone);
+      renumber(section);
+      setupCharacterCounters();
+      updateResumeStats();
+    }
+
+    function resetResumeForm() {
+      const form = document.getElementById("resumeForm");
+      form.reset();
+      clearDynamicSections();
+      dynamicSections.forEach(addEntry);
+      document.getElementById("photoBox").classList.add("hidden");
+      updateSectionOrder();
+      setupCharacterCounters();
+      updateResumeStats();
+    }
+
     function setupEventListeners() {
       document.querySelectorAll(".add-btn").forEach((button) => {
         button.addEventListener("click", () => {
@@ -898,6 +1001,11 @@
       document.addEventListener("click", (event) => {
         if (event.target.classList.contains("remove-btn")) {
           removeEntry(event.target);
+          updateResumeStats();
+        }
+
+        if (event.target.classList.contains("duplicate-btn")) {
+          duplicateEntry(event.target);
         }
       });
 
@@ -922,6 +1030,14 @@
         .addEventListener("click", () => loadJson(exampleResume));
 
       document
+        .getElementById("resetForm")
+        .addEventListener("click", resetResumeForm);
+
+      document
+        .getElementById("resumeForm")
+        .addEventListener("input", updateResumeStats);
+
+      document
         .getElementById("resumeForm")
         .addEventListener("submit", handleFormSubmit);
     }
@@ -943,6 +1059,8 @@
       ].forEach(addEntry);
 
       updateSectionOrder();
+      setupCharacterCounters();
+      updateResumeStats();
     }
 
     initializeForm();

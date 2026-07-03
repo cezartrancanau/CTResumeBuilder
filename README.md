@@ -18,6 +18,18 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 
 ---
 
+## What's New in v2
+
+- Improved dark mode visibility and contrast
+- Added resume statistics summary before export
+- Added character counters for long text fields
+- Improved generated PDF/TEX download filenames using the candidate name
+- Added reset form option
+- Added duplicate buttons for repeated resume entries
+- Improved form spacing, buttons, focus states and overall UI polish
+
+---
+
 ## What's New in v1
 
 - Multiple resume templates: Classic, Modern and Minimal
@@ -29,7 +41,7 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 - Interests / Hobbies section
 - Extended social links: GitHub, LinkedIn, Portfolio, Website, X, Stack Overflow, LeetCode, Codeforces and Kaggle
 - Drag-and-drop section ordering
-- Dark mode
+- Improved dark mode
 - Save resume as JSON draft
 - Import existing `resume.json`
 - One-click example resume loader
@@ -47,6 +59,10 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 - Automatically generates professional LaTeX resumes
 - Produces ATS-friendly PDF output
 - Dynamic resume sections with unlimited entries
+- Duplicate buttons for repeated entries
+- Resume statistics summary
+- Character counters for text areas
+- Reset form option
 - Resume import/export support
 - Lightweight and fully customizable
 
@@ -58,8 +74,12 @@ The application combines the flexibility of LaTeX with the simplicity of a graph
 - Automatic fallback PDF generation when a LaTeX distribution is unavailable
 - Responsive and intuitive web interface
 - Dynamic resume sections with unlimited entries
+- Duplicate buttons for repeated entries
+- Resume statistics summary
+- Character counters for text areas
+- Reset form option
 - Drag-and-drop section ordering
-- Dark mode
+- Improved dark mode
 - Save and load resume drafts using JSON
 - Support for:
   - Professional Summary
@@ -114,6 +134,12 @@ Run the application:
 python app.py
 ```
 
+On Windows, you can also double-click:
+
+```text
+run_app.bat
+```
+
 Open your browser:
 
 ```text
@@ -129,9 +155,10 @@ http://127.0.0.1:5050
 3. Complete the resume form.
 4. Add or remove resume entries dynamically.
 5. Reorder sections with drag and drop.
-6. Optional: save or import a JSON resume draft.
-7. Generate your resume.
-8. Download:
+6. Use duplicate buttons, character counters and resume statistics to polish the CV.
+7. Optional: save or import a JSON resume draft.
+8. Generate your resume.
+9. Download:
    - `cv.pdf`
    - `cv.tex`
    - `resume.json`

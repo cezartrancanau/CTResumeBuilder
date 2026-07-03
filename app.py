@@ -299,7 +299,7 @@ def save_profile_photo(work_dir: Path) -> tuple[str, Path | None]:
 
 
 def collect_resume_json() -> dict:
-    data: dict[str, object] = {"version": "v1"}
+    data: dict[str, object] = {"version": "v2"}
     for key in request.form.keys():
         values = request.form.getlist(key)
         data[key] = values if len(values) > 1 else values[0]
@@ -504,7 +504,14 @@ def download_file(file_id: str, filename: str):
     path = GENERATED_DIR / file_id / filename
     if not path.exists():
         return "File not found", 404
-    return send_file(path, as_attachment=True)
+    download_name = filename
+    if filename == "cv.pdf":
+        base_name = clean_filename(file_id.rsplit("_", 1)[0])
+        download_name = f"{base_name}_Resume.pdf"
+    elif filename == "cv.tex":
+        base_name = clean_filename(file_id.rsplit("_", 1)[0])
+        download_name = f"{base_name}_Resume.tex"
+    return send_file(path, as_attachment=True, download_name=download_name)
 
 
 if __name__ == "__main__":
