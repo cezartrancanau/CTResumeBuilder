@@ -72,3 +72,19 @@ body.dark .error { background: #450a0a; color: #fecaca; }
 body.dark .success { background: #052e16; color: #bbf7d0; }
 
 @media (max-width: 760px) { .stats-grid { grid-template-columns: 1fr; } }
+
+.section-help { margin: 0 0 12px; color: #64748b; }
+.social-link-grid { grid-template-columns: minmax(150px, 0.7fr) minmax(240px, 1.3fr); }
+.social-text-field { grid-column: 1 / -1; }
+body.dark .section-help { color: #94a3b8; }
+@media (max-width: 760px) { .social-link-grid { grid-template-columns: 1fr; } .social-text-field { grid-column: auto; } }
+
+/* Keep the primary Generate CV button visible in dark mode without changing light mode. */
+body.dark .generate-btn {
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+body.dark .generate-btn:hover {
+  background: #e2e8f0;
+}

@@ -33,7 +33,7 @@ def build_header(data: dict[str, str], social_links: list[tuple[str, str]]) -> s
     links = []
     for label, url in social_links:
         if label and url:
-            links.append(r"\href{" + safe_url(url) + r"}{" + latex_escape(label) + r"}")
+            links.append(r"\href{\detokenize{" + safe_url(url) + r"}}{" + latex_escape(label) + r"}")
         elif label:
             links.append(latex_escape(label))
     if links:
@@ -43,7 +43,7 @@ def build_header(data: dict[str, str], social_links: list[tuple[str, str]]) -> s
     email = data.get("EMAIL", "")
     email_raw = data.get("EMAIL_RAW", "")
     if email:
-        contact_parts.append(r"\href{mailto:" + email_raw + r"}{" + email + r"}")
+        contact_parts.append(r"\href{\detokenize{mailto:" + safe_url(email_raw) + r"}}{" + email + r"}")
     if data.get("PHONE", ""):
         contact_parts.append(data["PHONE"])
     if data.get("LOCATION", ""):
@@ -54,23 +54,18 @@ def build_header(data: dict[str, str], social_links: list[tuple[str, str]]) -> s
 
 
 def build_social_links() -> list[tuple[str, str]]:
+    platforms = request.form.getlist("social_platform")
+    texts = request.form.getlist("social_text")
+    urls = request.form.getlist("social_url")
     links = []
-    fields = [
-        ("GitHub", "github_text", "github_url"),
-        ("LinkedIn", "linkedin_text", "linkedin_url"),
-        ("Portfolio", "portfolio_text", "portfolio_url"),
-        ("Website", "website_text", "website_url"),
-        ("X", "x_text", "x_url"),
-        ("Stack Overflow", "stackoverflow_text", "stackoverflow_url"),
-        ("LeetCode", "leetcode_text", "leetcode_url"),
-        ("Codeforces", "codeforces_text", "codeforces_url"),
-        ("Kaggle", "kaggle_text", "kaggle_url"),
-    ]
-    for default_label, text_name, url_name in fields:
-        text = request.form.get(text_name, "").strip()
-        url = request.form.get(url_name, "").strip()
+
+    for platform, text, url in zip(platforms, texts, urls):
+        platform = platform.strip()
+        text = text.strip()
+        url = url.strip()
         if text or url:
-            links.append((text or default_label, url))
+            links.append((text or platform or "Website", url))
+
     return links
 
 
@@ -148,7 +143,7 @@ def build_projects() -> str:
             continue
         title = latex_escape(name)
         if url:
-            title = f"\\href{{{safe_url(url)}}}{{{title}}}"
+            title = f"\\href{{\\detokenize{{{safe_url(url)}}}}}{{{title}}}"
         rows.append(f"    \\resumeSubItem{{{title}}}\n      {{{latex_escape(desc)}}}")
     return "\n\n".join(rows)
 
@@ -160,7 +155,7 @@ def build_certifications() -> str:
             continue
         title = latex_escape(name)
         if url:
-            title = f"\\href{{{safe_url(url)}}}{{{title}}}"
+            title = f"\\href{{\\detokenize{{{safe_url(url)}}}}}{{{title}}}"
         detail = " | ".join(latex_escape(x) for x in [issuer, date] if x)
         rows.append(f"    \\resumeSubItem{{{title}}}\n      {{{detail}}}")
     return "\n\n".join(rows)
@@ -189,7 +184,7 @@ def build_publications() -> str:
             continue
         safe_title = latex_escape(title)
         if url:
-            safe_title = f"\\href{{{safe_url(url)}}}{{{safe_title}}}"
+            safe_title = f"\\href{{\\detokenize{{{safe_url(url)}}}}}{{{safe_title}}}"
         rows.append(f"    \\resumePublication\n      {{{safe_title}}}\n      {{{latex_escape(authors)}}}")
     return "\n\n".join(rows)
 

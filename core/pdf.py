@@ -15,11 +15,11 @@ def compile_pdf(tex_path: Path) -> tuple[Path | None, str | None]:
     pdflatex = shutil.which("pdflatex")
     if pdflatex is None:
         return None, "pdflatex was not found. Install MiKTeX or TeX Live for exact LaTeX output."
-    cmd = [pdflatex, "--disable-installer", "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", tex_path.name]
+    cmd = [pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", tex_path.name]
     try:
-        result = subprocess.run(cmd, cwd=tex_path.parent, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=8)
+        result = subprocess.run(cmd, cwd=tex_path.parent, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=60)
     except subprocess.TimeoutExpired:
-        return None, "Exact LaTeX generation timed out. MiKTeX may be waiting for package installation."
+        return None, "Exact LaTeX generation timed out. Open MiKTeX Console, install pending updates/packages, then try again."
     pdf_path = tex_path.with_suffix(".pdf")
     if result.returncode != 0 or not pdf_path.exists():
         return None, result.stdout[-3000:] if result.stdout else "Unknown LaTeX error."
@@ -29,6 +29,15 @@ def compile_pdf(tex_path: Path) -> tuple[Path | None, str | None]:
 def add_pdf_section(story, styles, title: str):
     story.append(Spacer(1, 8))
     story.append(Paragraph(f"<b>{html.escape(title)}</b>", styles["Heading2"]))
+
+
+def clickable_text(label: str, url: str) -> str:
+    """Return ReportLab-safe clickable text, or plain text when no URL exists."""
+    safe_label = html.escape((label or "").strip())
+    safe_link = html.escape((url or "").strip(), quote=True)
+    if not safe_link:
+        return safe_label
+    return f'<link href="{safe_link}">{safe_label or safe_link}</link>'
 
 
 def build_fallback_pdf(pdf_path: Path, form_data, photo_path: Path | None) -> None:
@@ -43,10 +52,23 @@ def build_fallback_pdf(pdf_path: Path, form_data, photo_path: Path | None) -> No
     name = plain_text(form_data.get("name", "")) or "Resume"
     story.append(Paragraph(f"<b>{name}</b>", styles["Title"]))
     contact = []
-    for key in ["location", "email", "phone", "github_text", "linkedin_text", "portfolio_text", "website_text"]:
-        value = form_data.get(key, "").strip()
-        if value:
-            contact.append(plain_text(value))
+    location = form_data.get("location", "").strip()
+    email = form_data.get("email", "").strip()
+    phone = form_data.get("phone", "").strip()
+    if location:
+        contact.append(plain_text(location))
+    if email:
+        contact.append(clickable_text(email, f"mailto:{email}"))
+    if phone:
+        contact.append(plain_text(phone))
+    for platform, text, url in zip(
+        form_data.getlist("social_platform"),
+        form_data.getlist("social_text"),
+        form_data.getlist("social_url"),
+    ):
+        label = (text or platform or "Website").strip()
+        if label or url.strip():
+            contact.append(clickable_text(label, url))
     if contact:
         story.append(Paragraph(" | ".join(contact), styles["Normal"]))
 
@@ -90,14 +112,16 @@ def build_fallback_pdf(pdf_path: Path, form_data, photo_path: Path | None) -> No
             if rows:
                 add_pdf_section(story, styles, SECTION_LABELS[section])
                 for n, u, d in rows:
-                    story.append(Paragraph(f"<b>{plain_text(n)}</b> {plain_text(u)}", styles["Normal"]))
+                    story.append(Paragraph(f"<b>{clickable_text(n, u)}</b>", styles["Normal"]))
                     story.append(Paragraph(plain_text(d), styles["Normal"]))
         elif section == "certifications":
             rows = [(n, i, d, u) for n, i, d, u in zip(form_data.getlist("cert_name"), form_data.getlist("cert_issuer"), form_data.getlist("cert_date"), form_data.getlist("cert_url")) if n.strip() or i.strip() or d.strip() or u.strip()]
             if rows:
                 add_pdf_section(story, styles, SECTION_LABELS[section])
                 for n, i, d, u in rows:
-                    story.append(Paragraph(f"<b>{plain_text(n)}</b> — {' | '.join(plain_text(x) for x in [i, d, u] if x.strip())}", styles["Normal"]))
+                    detail = " | ".join(plain_text(x) for x in [i, d] if x.strip())
+                    title = clickable_text(n, u)
+                    story.append(Paragraph(f"<b>{title}</b>" + (f" — {detail}" if detail else ""), styles["Normal"]))
         elif section == "awards":
             rows = [(n, d, da, b) for n, d, da, b in zip(form_data.getlist("award_name"), form_data.getlist("award_description"), form_data.getlist("award_dates"), form_data.getlist("award_bullets")) if n.strip() or d.strip() or da.strip() or b.strip()]
             if rows:
@@ -111,7 +135,8 @@ def build_fallback_pdf(pdf_path: Path, form_data, photo_path: Path | None) -> No
             if rows:
                 add_pdf_section(story, styles, SECTION_LABELS[section])
                 for t, a, u in rows:
-                    story.append(Paragraph(f"<b>{plain_text(t)}</b> — {plain_text(a)} {plain_text(u)}", styles["Normal"]))
+                    title = clickable_text(t, u)
+                    story.append(Paragraph(f"<b>{title}</b> — {plain_text(a)}", styles["Normal"]))
     if len(story) <= 3:
         story.append(Paragraph("Fill in more fields to build your CV.", styles["Normal"]))
     pdf_path.parent.mkdir(parents=True, exist_ok=True)

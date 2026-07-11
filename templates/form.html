@@ -103,89 +103,10 @@
 
       <fieldset>
         <legend>Social links</legend>
+        <p class="section-help">Add only the social profiles you want to display on your resume.</p>
 
-        <div class="grid social-grid">
-          <div>
-            <label>GitHub URL</label>
-            <input name="github_url" placeholder="https://github.com/username">
-          </div>
-          <div>
-            <label>GitHub text</label>
-            <input name="github_text" placeholder="github.com/username">
-          </div>
-
-          <div>
-            <label>LinkedIn URL</label>
-            <input name="linkedin_url" placeholder="https://linkedin.com/in/username">
-          </div>
-          <div>
-            <label>LinkedIn text</label>
-            <input name="linkedin_text" placeholder="linkedin.com/in/username">
-          </div>
-
-          <div>
-            <label>Portfolio URL</label>
-            <input name="portfolio_url">
-          </div>
-          <div>
-            <label>Portfolio text</label>
-            <input name="portfolio_text">
-          </div>
-
-          <div>
-            <label>Website URL</label>
-            <input name="website_url">
-          </div>
-          <div>
-            <label>Website text</label>
-            <input name="website_text">
-          </div>
-
-          <div>
-            <label>X URL</label>
-            <input name="x_url">
-          </div>
-          <div>
-            <label>X text</label>
-            <input name="x_text">
-          </div>
-
-          <div>
-            <label>Stack Overflow URL</label>
-            <input name="stackoverflow_url">
-          </div>
-          <div>
-            <label>Stack Overflow text</label>
-            <input name="stackoverflow_text">
-          </div>
-
-          <div>
-            <label>LeetCode URL</label>
-            <input name="leetcode_url">
-          </div>
-          <div>
-            <label>LeetCode text</label>
-            <input name="leetcode_text">
-          </div>
-
-          <div>
-            <label>Codeforces URL</label>
-            <input name="codeforces_url">
-          </div>
-          <div>
-            <label>Codeforces text</label>
-            <input name="codeforces_text">
-          </div>
-
-          <div>
-            <label>Kaggle URL</label>
-            <input name="kaggle_url">
-          </div>
-          <div>
-            <label>Kaggle text</label>
-            <input name="kaggle_text">
-          </div>
-        </div>
+        <div id="social_links_container"></div>
+        <button type="button" class="secondary" id="addSocialLink">+ Add social link</button>
       </fieldset>
 
       <section id="sectionList">
@@ -284,7 +205,7 @@
         The app tries LaTeX first. If LaTeX is unavailable, it still generates a fast fallback PDF.
       </p>
 
-      <button type="submit">Generate CV</button>
+      <button type="submit" class="generate-btn">Generate CV</button>
     </form>
   </main>
 
@@ -575,6 +496,80 @@
       `
     };
 
+    const SOCIAL_PLATFORMS = {
+      GitHub: { url: "https://github.com/username", text: "github.com/username" },
+      LinkedIn: { url: "https://linkedin.com/in/username", text: "linkedin.com/in/username" },
+      Portfolio: { url: "https://example.com", text: "Portfolio" },
+      Website: { url: "https://example.com", text: "example.com" },
+      X: { url: "https://x.com/username", text: "x.com/username" },
+      "Stack Overflow": { url: "https://stackoverflow.com/users/id/username", text: "stackoverflow.com/users/id/username" },
+      LeetCode: { url: "https://leetcode.com/u/username", text: "leetcode.com/u/username" },
+      Codeforces: { url: "https://codeforces.com/profile/username", text: "codeforces.com/profile/username" },
+      Kaggle: { url: "https://kaggle.com/username", text: "kaggle.com/username" }
+    };
+
+    function socialLinkTemplate() {
+      const options = Object.keys(SOCIAL_PLATFORMS)
+        .map((platform) => `<option value="${platform}">${platform}</option>`)
+        .join("");
+
+      return `
+        <div class="row-block social-link-entry" data-entry="social">
+          <div class="row-header">
+            <h3>Social link</h3>
+            <button type="button" class="remove-btn remove-social-link">Remove</button>
+          </div>
+          <div class="grid social-link-grid">
+            <div>
+              <label>Platform</label>
+              <select name="social_platform" class="social-platform">
+                ${options}
+              </select>
+            </div>
+            <div>
+              <label>URL</label>
+              <input name="social_url" class="social-url" placeholder="https://github.com/username">
+            </div>
+            <div class="social-text-field">
+              <label>Display text</label>
+              <input name="social_text" class="social-text" placeholder="github.com/username">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function addSocialLink(values = {}) {
+      const container = document.getElementById("social_links_container");
+      container.insertAdjacentHTML("beforeend", socialLinkTemplate());
+      const entry = container.lastElementChild;
+      const platform = values.platform || "GitHub";
+
+      entry.querySelector(".social-platform").value = platform;
+      entry.querySelector(".social-url").value = values.url || "";
+      entry.querySelector(".social-text").value = values.text || "";
+      updateSocialLinkPlaceholders(entry);
+      renumberSocialLinks();
+      updateResumeStats();
+    }
+
+    function updateSocialLinkPlaceholders(entry) {
+      const platform = entry.querySelector(".social-platform").value;
+      const defaults = SOCIAL_PLATFORMS[platform] || { url: "https://", text: platform };
+      entry.querySelector(".social-url").placeholder = defaults.url;
+      entry.querySelector(".social-text").placeholder = defaults.text;
+    }
+
+    function renumberSocialLinks() {
+      document.querySelectorAll(".social-link-entry").forEach((entry, index) => {
+        entry.querySelector("h3").textContent = `Social link ${index + 1}`;
+      });
+    }
+
+    function clearSocialLinks() {
+      document.getElementById("social_links_container").innerHTML = "";
+    }
+
     const exampleResume = {
       name: "Cezar Trancanau",
       location: "Bucharest, Romania",
@@ -582,12 +577,17 @@
       phone: "+40 700 000 000",
       resume_template: "modern",
 
-      github_url: "https://github.com/cezartrancanau",
-      github_text: "github.com/cezartrancanau",
-      linkedin_url: "https://linkedin.com/in/cezartrancanau",
-      linkedin_text: "linkedin.com/in/cezartrancanau",
-      portfolio_url: "https://example.com",
-      portfolio_text: "Portfolio",
+      social_platform: ["GitHub", "LinkedIn", "Portfolio"],
+      social_url: [
+        "https://github.com/cezartrancanau",
+        "https://linkedin.com/in/cezartrancanau",
+        "https://example.com"
+      ],
+      social_text: [
+        "github.com/cezartrancanau",
+        "linkedin.com/in/cezartrancanau",
+        "Portfolio"
+      ],
 
       summary:
         "Junior IT / Software enthusiast with hands-on experience building Flask applications, working with databases, and creating practical tools for real users.",
@@ -834,6 +834,26 @@
 
     function loadJson(data) {
       clearDynamicSections();
+      clearSocialLinks();
+
+      const socialPlatforms = Array.isArray(data.social_platform)
+        ? data.social_platform
+        : data.social_platform ? [data.social_platform] : [];
+      const socialUrls = Array.isArray(data.social_url)
+        ? data.social_url
+        : data.social_url ? [data.social_url] : [];
+      const socialTexts = Array.isArray(data.social_text)
+        ? data.social_text
+        : data.social_text ? [data.social_text] : [];
+      const socialCount = Math.max(socialPlatforms.length, socialUrls.length, socialTexts.length);
+
+      for (let index = 0; index < socialCount; index++) {
+        addSocialLink({
+          platform: socialPlatforms[index] || "Website",
+          url: socialUrls[index] || "",
+          text: socialTexts[index] || ""
+        });
+      }
 
       const sectionCountKeys = getDynamicSectionCounts(data);
 
@@ -984,6 +1004,7 @@
       const form = document.getElementById("resumeForm");
       form.reset();
       clearDynamicSections();
+      clearSocialLinks();
       dynamicSections.forEach(addEntry);
       document.getElementById("photoBox").classList.add("hidden");
       updateSectionOrder();
@@ -998,7 +1019,22 @@
         });
       });
 
+      document.getElementById("addSocialLink").addEventListener("click", () => addSocialLink());
+
+      document.addEventListener("change", (event) => {
+        if (event.target.classList.contains("social-platform")) {
+          updateSocialLinkPlaceholders(event.target.closest(".social-link-entry"));
+        }
+      });
+
       document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("remove-social-link")) {
+          event.target.closest(".social-link-entry").remove();
+          renumberSocialLinks();
+          updateResumeStats();
+          return;
+        }
+
         if (event.target.classList.contains("remove-btn")) {
           removeEntry(event.target);
           updateResumeStats();

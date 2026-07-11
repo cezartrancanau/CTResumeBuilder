@@ -148,6 +148,19 @@ http://127.0.0.1:5050
 
 ---
 
+## What's New in v3
+
+- Made the **Generate CV** button clearly visible in dark mode while preserving its original light-mode styling
+- Fixed social-link and project URLs so they create real clickable hyperlinks in both LaTeX and fallback PDFs
+- Replaced the large fixed social-links grid with a compact dynamic social-link builder
+- Added an **Add social link** button so users create only the profiles they need
+- Added a platform selector for GitHub, LinkedIn, Portfolio, Website, X, Stack Overflow, LeetCode, Codeforces and Kaggle
+- Added platform-specific URL and display-text placeholders
+- Added individual removal controls and automatic numbering for social links
+- Updated JSON draft import/export and resume generation to support dynamic social links
+
+---
+
 ## What's New in v2
 
 - Improved dark mode visibility and contrast
@@ -180,11 +193,3 @@ http://127.0.0.1:5050
 - Automatic cleanup for older generated files
 - Cleaner generated filenames
 - Improved fallback PDF generation when LaTeX is unavailable
-
----
-
-## Contributing
-
-Contributions, feature requests and bug reports are welcome.
-
-If you have an idea for an improvement, feel free to open an issue or submit a pull request.
